@@ -50,7 +50,7 @@ Shader "KK/Ground_Multi_NoUV"
 
 		Stencil
 		{
-			Ref 4
+			Ref 3
 			Comp Always
 			Pass Replace
 		}  
@@ -58,15 +58,15 @@ Shader "KK/Ground_Multi_NoUV"
         CGPROGRAM
         // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
         #pragma exclude_renderers gles
-        //
-        #pragma surface surf BlinnPhong fullforwardshadows nofog
-
+        
+        #pragma surface surf BlinnPhongKSP fullforwardshadows nofog
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
 
 		//#include "TileRandom-include.cginc"
 		#include "TileRandom2-include.cginc"
+		#include "LightingKSP.cginc"
 		#include "KSP-include.cginc"
 
     	sampler2D _BlendMaskTexture;
@@ -306,7 +306,14 @@ Shader "KK/Ground_Multi_NoUV"
 			o.Albedo = fog.rgb;
 			o.Emission *= fog.a;
         	o.Specular = (0);
-			// o.SpecularColor = (0,0,0,0);
+			
+
+#if UNITY_PASS_DEFERRED
+			// In deferred rendering do not use the flat ambient because Deferred adds its own ambient as a composite of flat ambient and probe
+			unity_SHAr = 0.0.xxxx;
+			unity_SHAg = 0.0.xxxx;
+			unity_SHAb = 0.0.xxxx;
+#endif
 		}
 
         ENDCG

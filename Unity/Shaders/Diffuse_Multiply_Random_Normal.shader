@@ -24,7 +24,7 @@ Shader "KK/Diffuse_Multiply_Random"
 
 		Stencil
 		{
-			Ref 4
+			Ref 3
 			Comp Always
 			Pass Replace
 		}  
@@ -34,10 +34,11 @@ Shader "KK/Diffuse_Multiply_Random"
         #pragma exclude_renderers gles
         
 		// Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf BlinnPhong fullforwardshadows nofog
+        #pragma surface surf BlinnPhongKSP fullforwardshadows nofog
  
         #pragma target 3.0
 
+		#include "LightingKSP.cginc"
         #include "KSP-include.cginc"
 		#include "TileRandom2-include.cginc"
 		//#include "TileRandom-include.cginc"
@@ -55,7 +56,6 @@ Shader "KK/Diffuse_Multiply_Random"
 		//float4 _EmissiveColor;
 
 		//standard shader params for adjusting color/etc
-		float4 _Color;
 		float _MakeGrayScale;
 
 		struct Input
@@ -125,7 +125,13 @@ Shader "KK/Diffuse_Multiply_Random"
 			o.Emission *= fog.a;
         	o.Specular = (0);
 			o.Normal = normal;
-			// o.SpecularColor = (0,0,0,0);
+
+#if UNITY_PASS_DEFERRED
+			// In deferred rendering do not use the flat ambient because Deferred adds its own ambient as a composite of flat ambient and probe
+			unity_SHAr = 0.0.xxxx;
+			unity_SHAg = 0.0.xxxx;
+			unity_SHAb = 0.0.xxxx;
+#endif
 		}
 
         ENDCG
